@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using IKhom.SceneManagementSystem.Runtime.helpers;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,41 +9,49 @@ namespace IKhom.SceneManagementSystem.Runtime.data
     public class SceneLoader : MonoBehaviour
     {
         [Header("Loading Settings")]
-        [SerializeField] private Image _loadingBar;
-        [SerializeField] private Canvas _loadingCanvas;
-        [SerializeField] private Camera _loadingCamera;
-        [SerializeField] private float _fillSpeed = 0.5f;
-        [SerializeField] private float _minLoadingTime = 10f;
-        [SerializeField] private float _pauseAfterLoaded = 2f;
+        [SerializeField]
+        private Image _loadingBar;
+
+        [SerializeField]
+        private Canvas _loadingCanvas;
+
+        [SerializeField]
+        private Camera _loadingCamera;
+
+        [SerializeField]
+        private float _fillSpeed = 0.5f;
+
+        [SerializeField]
+        private float _pauseAfterLoaded = 2f;
+
+        [SerializeField]
+        private float _jumpToEndTime;
+
         [Space]
         [Header("Scenes Loading Settings")]
-        [SerializeField] private SceneGroup[] _sceneGroups;
-        [SerializeField] private bool _persistentBootstrap;
-        [SerializeField] private bool _clearResourcesUnUnload;
+        [SerializeField]
+        private SceneGroup[] _sceneGroups;
 
+        [SerializeField]
+        private bool _persistentBootstrap;
+
+        [SerializeField]
+        private bool _clearResourcesUnUnload;
 
         public SceneGroup[] SceneGroups => _sceneGroups;
-        
-        
+
         private float _targetProgress;
         private bool _isLoading;
-        private float _elapsedTime;
-        private bool _scenesLoaded;
         private SceneGroupManager _manager;
-
+        private bool _sceneIsLoaded;
+        private float _increment;
 
         private void Awake()
         {
             _manager = new SceneGroupManager(_persistentBootstrap, _clearResourcesUnUnload);
-            _manager.OnSceneLoaded += sceneName =>
-            {
-                Debug.Log($"Loaded: {sceneName}");
-            };
+            _manager.OnSceneLoaded += sceneName => { Debug.Log($"Loaded: {sceneName}"); };
             _manager.OnSceneUnloaded += sceneName => Debug.Log($"Unloaded: {sceneName}");
-            _manager.OnSceneGroupLoaded += () =>
-            {
-                _scenesLoaded = true;
-            };
+            _manager.OnSceneGroupLoaded += () => Debug.Log($"Scene Groups is Loaded");
         }
 
         private async void Start()
@@ -50,38 +59,26 @@ namespace IKhom.SceneManagementSystem.Runtime.data
             await LoadSceneGroupAsync(0);
         }
 
-        private bool _timeAdjusted;
-        private float _dynamicFillSpeed;
-
         private void Update()
         {
-           
             if (!_isLoading)
             {
                 return;
             }
 
-            _elapsedTime += Time.deltaTime;
-            
-            var currentFillAmount =_loadingBar.fillAmount;
-            var progressDifference = Mathf.Abs(currentFillAmount - _targetProgress);
-
-            if (!_scenesLoaded)
+            if (_sceneIsLoaded)
             {
-                _dynamicFillSpeed = progressDifference * _fillSpeed;
-                _loadingBar.fillAmount = Mathf.Lerp(currentFillAmount, _targetProgress, Time.deltaTime * _dynamicFillSpeed);
+                _loadingBar.fillAmount = _jumpToEndTime == 0
+                    ? _targetProgress
+                    : Mathf.MoveTowards(_loadingBar.fillAmount, _targetProgress, Time.deltaTime * _increment);
             }
             else
             {
-                if (!_timeAdjusted)
-                {
-                    var remainingTime = _minLoadingTime - _elapsedTime;
-                    _dynamicFillSpeed = progressDifference / remainingTime;
-                    _timeAdjusted = true;
-                }
-
+                var currentFillAmount = _loadingBar.fillAmount;
+                var progressDifference = Mathf.Abs(currentFillAmount - _targetProgress);
+                var dynamicFillSpeed = progressDifference * _fillSpeed;
                 _loadingBar.fillAmount =
-                    Mathf.MoveTowards(currentFillAmount, _targetProgress, Time.deltaTime * _dynamicFillSpeed);
+                    Mathf.Lerp(currentFillAmount, _targetProgress, Time.deltaTime * dynamicFillSpeed);
             }
         }
 
@@ -89,41 +86,30 @@ namespace IKhom.SceneManagementSystem.Runtime.data
         {
             _loadingBar.fillAmount = 0f;
             _targetProgress = 1f;
-            _elapsedTime = 0f;
-            _scenesLoaded = false;
-
-            Debug.Assert(index >= 0 && index < SceneGroups.Length,
-                $"Invalid scene group index: {index}", this);
+            _sceneIsLoaded = false;
+            Debug.Assert(index >= 0 && index < SceneGroups.Length, $"Invalid scene group index: {index}", this);
 
             var progress = new SceneLoadProgress();
-
             progress.Progressed += t => _targetProgress = Mathf.Max(t, _targetProgress);
 
             EnableLoadingCanvas();
-            var loadingTask = _manager.LoadScenes(SceneGroups[index], progress);
-            //Wait for that, if elapsed time < min time wait for difference
-            //else if elapsed time more then min => set progress to 100
-            
-            
-            var minTimeTask = Task.Delay(TimeSpan.FromSeconds(_minLoadingTime));
+            await _manager.LoadScenes(SceneGroups[index], progress);
+            _sceneIsLoaded = true;
 
-            await Task.WhenAll(loadingTask, minTimeTask);
-
-            if (_elapsedTime >= _minLoadingTime)
+            if (_jumpToEndTime != 0)
             {
-                _loadingBar.fillAmount = 1f;
+                _increment = Mathf.Abs(_targetProgress - _loadingBar.fillAmount) / _jumpToEndTime;
             }
-            
-            await Task.Delay(TimeSpan.FromSeconds(_pauseAfterLoaded));
-            
+
+            await Task.Delay(TimeSpan.FromSeconds(_pauseAfterLoaded + (_jumpToEndTime != 0 ? _jumpToEndTime : 0)));
             EnableLoadingCanvas(false);
         }
 
         private void EnableLoadingCanvas(bool enable = true)
         {
             _isLoading = enable;
-            _loadingCanvas.gameObject.SetActive(enable);
-            _loadingCamera.gameObject.SetActive(enable);
+            if (_loadingCanvas != null) _loadingCanvas.gameObject.SetActive(enable);
+            if (_loadingCamera != null) _loadingCamera.gameObject.SetActive(enable);
         }
     }
 }

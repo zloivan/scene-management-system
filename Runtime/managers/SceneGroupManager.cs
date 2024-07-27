@@ -53,7 +53,6 @@ namespace IKhom.SceneManagementSystem.Runtime.data
                 }
                 
                 var operation = SceneManager.LoadSceneAsync(sceneData.Reference.Path, LoadSceneMode.Additive);
-                await Task.Delay(2500);
                 
                 operationGroup.Operations.Add(operation);
                 
