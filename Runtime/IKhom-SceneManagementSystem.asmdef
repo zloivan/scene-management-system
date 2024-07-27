@@ -1,6 +1,6 @@
 {
-    "name": "SceneManagementSystem",
-    "rootNamespace": "Systems",
+    "name": "IKhom-SceneManagementSystem",
+    "rootNamespace": "IKhom",
     "references": [
         "UniTask",
         "Eflatun.SceneReference"

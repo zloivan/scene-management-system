@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Eflatun.SceneReference;
 
-namespace Systems.SceneManagementSystem.Runtime.Data
+namespace IKhom.SceneManagementSystem.Runtime.data
 {
     [Serializable]
     public class SceneData
@@ -13,6 +13,7 @@ namespace Systems.SceneManagementSystem.Runtime.Data
         public SceneType SceneType;
     }
 
+    [Serializable]
     public class SceneGroup
     {
         public string GroupName = "New Scene Group";

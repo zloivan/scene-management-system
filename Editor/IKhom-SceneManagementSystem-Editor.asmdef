@@ -1,0 +1,18 @@
+{
+    "name": "IKhom-SceneManagementSystem-Editor",
+    "rootNamespace": "",
+    "references": [
+        "IKhom-SceneManagementSystem"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

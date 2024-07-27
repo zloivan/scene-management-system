@@ -1,4 +1,4 @@
-namespace Systems.SceneManagementSystem.Runtime.Data
+namespace IKhom.SceneManagementSystem.Runtime.data
 {
     public enum SceneType
     {
