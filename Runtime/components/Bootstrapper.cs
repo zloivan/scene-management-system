@@ -9,9 +9,9 @@ namespace IKhom.SceneManagementSystem.Runtime.data
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static async void Init()
         {
-            Debug.Log("Bootstrapper...");
-
-            await SceneManager.LoadSceneAsync("Bootstrapper", LoadSceneMode.Single);
+            // Debug.Log("Bootstrapper...");
+            //
+            // await SceneManager.LoadSceneAsync("Bootstrapper", LoadSceneMode.Single);
         }
     }
 }

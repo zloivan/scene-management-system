@@ -15,13 +15,15 @@ namespace IKhom.SceneManagementSystem.Runtime.data
 
         private readonly bool _isBootstrapPersistentScene;
         private readonly bool _unloadRecoursesWithScenes;
+        private readonly string _bootstrapper;
 
         public SceneGroup ActiveSceneGroup { get; private set; }
 
-        public SceneGroupManager(bool isBootstrapPersistent, bool unloadRecoursesWithScenes)
+        public SceneGroupManager(bool isBootstrapPersistent, bool unloadRecoursesWithScenes, string bootstrapSceneName = "Bootstrapper")
         {
             _isBootstrapPersistentScene = isBootstrapPersistent;
             _unloadRecoursesWithScenes = unloadRecoursesWithScenes;
+            _bootstrapper = bootstrapSceneName;
         }
 
         public async Task LoadScenes(SceneGroup group, IProgress<float> progress, bool reloadDupScenes = false)
@@ -95,7 +97,7 @@ namespace IKhom.SceneManagementSystem.Runtime.data
 
                 var sceneName = sceneAt.name;
 
-                if (sceneName.Equals(activeScene) || (sceneName == "Bootstrapper" && _isBootstrapPersistentScene))
+                if (sceneName.Equals(activeScene) || (sceneName == _bootstrapper && _isBootstrapPersistentScene))
                 {
                     continue;
                 }

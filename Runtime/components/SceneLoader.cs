@@ -30,13 +30,19 @@ namespace IKhom.SceneManagementSystem.Runtime.data
         [Space]
         [Header("Scenes Loading Settings")]
         [SerializeField]
-        private SceneGroup[] _sceneGroups;
+        private string _bootstrapSceneName;
+
+        [SerializeField]
+        private bool _loadFirstGroupOnStart;
 
         [SerializeField]
         private bool _persistentBootstrap;
 
         [SerializeField]
         private bool _clearResourcesUnUnload;
+
+        [SerializeField]
+        private SceneGroup[] _sceneGroups;
 
         public SceneGroup[] SceneGroups => _sceneGroups;
 
@@ -48,7 +54,10 @@ namespace IKhom.SceneManagementSystem.Runtime.data
 
         private void Awake()
         {
-            _manager = new SceneGroupManager(_persistentBootstrap, _clearResourcesUnUnload);
+            _manager = string.IsNullOrEmpty(_bootstrapSceneName)
+                ? new SceneGroupManager(_persistentBootstrap, _clearResourcesUnUnload)
+                : new SceneGroupManager(_persistentBootstrap, _clearResourcesUnUnload, _bootstrapSceneName);
+
             _manager.OnSceneLoaded += sceneName => { Debug.Log($"Loaded: {sceneName}"); };
             _manager.OnSceneUnloaded += sceneName => Debug.Log($"Unloaded: {sceneName}");
             _manager.OnSceneGroupLoaded += () => Debug.Log($"Scene Groups is Loaded");
@@ -56,7 +65,7 @@ namespace IKhom.SceneManagementSystem.Runtime.data
 
         private async void Start()
         {
-            await LoadSceneGroupAsync(0);
+            if (_loadFirstGroupOnStart) await LoadSceneGroupAsync(0);
         }
 
         private void Update()
