@@ -8,14 +8,17 @@ public class SceneLoaderEditor : Editor {
     public override void OnInspectorGUI() {
         DrawDefaultInspector();
 
-        SceneLoader sceneLoader = (SceneLoader) target;
+        var sceneLoader = (SceneLoader) target;
 
-        if (EditorApplication.isPlaying && GUILayout.Button("Load First Scene Group")) {
-            LoadSceneGroup(sceneLoader, 0);
-        }
-            
-        if (EditorApplication.isPlaying && GUILayout.Button("Load Second Scene Group")) {
-            LoadSceneGroup(sceneLoader, 1);
+        if (!EditorApplication.isPlaying) return;
+        
+        var numberOfGroups = sceneLoader.SceneGroups;
+
+        for (var i = 0; i < numberOfGroups.Length; i++)
+        {
+            if (GUILayout.Button($"Load Scene Group: {numberOfGroups[i].GroupName}")) {
+                LoadSceneGroup(sceneLoader, i);
+            }
         }
     }
 

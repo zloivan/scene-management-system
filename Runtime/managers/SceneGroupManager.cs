@@ -53,10 +53,9 @@ namespace IKhom.SceneManagementSystem.Runtime.data
                 }
                 
                 var operation = SceneManager.LoadSceneAsync(sceneData.Reference.Path, LoadSceneMode.Additive);
+                await Task.Delay(2500);
                 
-                await Task.Delay(TimeSpan.FromSeconds(2.5f)); //TODO REmove
                 operationGroup.Operations.Add(operation);
-                
                 
                 OnSceneLoaded?.Invoke(sceneData.Name);
             }
