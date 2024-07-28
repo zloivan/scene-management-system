@@ -1,13 +1,17 @@
 using System;
 using System.Threading.Tasks;
-using IKhom.SceneManagementSystem.Runtime.helpers;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace IKhom.SceneManagementSystem.Runtime.data
 {
     public class SceneLoader : MonoBehaviour
     {
+        public UnityEvent<string> OnSceneLoaded = new();
+        public UnityEvent<string> OnSceneUnloaded = new();
+        public UnityEvent OnSceneGroupLoaded = new();
+        
         [Header("Loading Settings")]
         [SerializeField]
         private Image _loadingBar;
@@ -58,9 +62,9 @@ namespace IKhom.SceneManagementSystem.Runtime.data
                 ? new SceneGroupManager(_persistentBootstrap, _clearResourcesUnUnload)
                 : new SceneGroupManager(_persistentBootstrap, _clearResourcesUnUnload, _bootstrapSceneName);
 
-            _manager.OnSceneLoaded += sceneName => { Debug.Log($"Loaded: {sceneName}"); };
-            _manager.OnSceneUnloaded += sceneName => Debug.Log($"Unloaded: {sceneName}");
-            _manager.OnSceneGroupLoaded += () => Debug.Log($"Scene Groups is Loaded");
+            _manager.OnSceneLoaded += sceneName => OnSceneLoaded?.Invoke(sceneName);
+            _manager.OnSceneUnloaded += sceneName => OnSceneUnloaded?.Invoke(sceneName);
+            _manager.OnSceneGroupLoaded += () => OnSceneGroupLoaded?.Invoke();
         }
 
         private async void Start()

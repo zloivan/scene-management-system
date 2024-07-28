@@ -420,6 +420,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38ff57c8194f4bd8b77caa22689d73cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OnSceneLoaded:
+    m_PersistentCalls:
+      m_Calls: []
   _loadingBar: {fileID: 2009612369}
   _loadingCanvas: {fileID: 71744813}
   _loadingCamera: {fileID: 0}
@@ -427,6 +430,9 @@ MonoBehaviour:
   _pauseAfterLoaded: 0.5
   _jumpToEndTime: 0.3
   _bootstrapSceneName: 
+  _loadFirstGroupOnStart: 1
+  _persistentBootstrap: 1
+  _clearResourcesUnUnload: 1
   _sceneGroups:
   - GroupName: MainMenu
     Scenes:
@@ -452,8 +458,6 @@ MonoBehaviour:
         asset: {fileID: 102900000, guid: 67827430889aa824fb96ba427fe5afd0, type: 3}
         guid: 67827430889aa824fb96ba427fe5afd0
       SceneType: 0
-  _persistentBootstrap: 1
-  _clearResourcesUnUnload: 1
 --- !u!1 &1466754847
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,0 +1,1 @@
+https://unity.com/ru/blog/engine-platform/addressables-planning-and-best-practices
